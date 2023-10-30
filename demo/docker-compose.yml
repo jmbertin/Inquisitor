@@ -1,0 +1,29 @@
+services:
+  vsftpd_server:
+    build:
+      context: ./server/
+    ports:
+      - "20-21:20-21"
+    networks:
+      - mynetwork
+
+  ftp_client:
+    build:
+      context: ./client/
+    depends_on:
+      - vsftpd_server
+    networks:
+      - mynetwork
+
+  inquisitor:
+    build:
+      context: ./inquisitor/
+    depends_on:
+      - vsftpd_server
+      - ftp_client
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

@@ -1,0 +1,76 @@
+#!/usr/bin/expect
+
+set timeout 20
+sleep 10
+
+# Spawn the ftp command
+spawn ftp vsftpd_server
+
+# Wait for the ftp> prompt and then send the user and pass
+expect "Name*:"
+send "victim42\r"
+expect "Password:"
+send "this_is_my_password\r"
+
+# Infinite loop of random actions
+while {1} {
+    set action [expr {int(rand()*5)}]  ;# Note: Now choosing among 5 actions
+
+    switch $action {
+        0 {
+            # List directory
+            send "ls\r"
+            expect "ftp>"            send "cd upload\r"
+            expect "ftp>"
+            send "put upload2.txt\r"
+            expect "ftp>"
+            send "cd ..\r"
+            expect "ftp>"
+        }
+        1 {
+            # Change to the 'upload' directory
+            send "cd upload\r"
+            expect "ftp>"
+            send "put upload1.txt\r"
+            expect "ftp>"
+            send "cd ..\r"
+            expect "ftp>"
+        }
+        2 {
+            # Get a random file (ensure such a file exists in the server)
+            send "get doc.ods\r"
+            expect "ftp>"
+        }
+        2 {
+            # Get a random file (ensure such a file exists in the server)
+            send "get square.obj\r"
+            expect "ftp>"
+        }
+        3 {
+            # Get a random file (ensure such a file exists in the server)
+            send "get img.jpg\r"
+            expect "ftp>"
+        }
+        4 {
+            # Get a random file (ensure such a file exists in the server)
+            send "get README.md\r"
+            expect "ftp>"
+        }
+        5 {
+            # Change to the 'upload' directory
+            send "cd upload\r"
+            expect "ftp>"
+            send "put upload2.txt\r"
+            expect "ftp>"
+            send "cd ..\r"
+            expect "ftp>"
+        }
+    }
+
+    # Wait for a random duration between actions (between 5 to 10 seconds in this case)
+    sleep [expr {int(5 + rand()*5)}]
+}
+
+# End the ftp session (this line won't be reached due to the infinite loop, but it's here for completeness)
+send "bye\r"
+expect eof
